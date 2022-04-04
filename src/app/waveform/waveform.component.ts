@@ -104,19 +104,19 @@ export class WaveformComponent implements OnInit {
   }
 
   private renderCursor() {
-    this.basic_cursor_A = this.svg
-      .append('g')
-      .selectAll('.cursor')
-      .data([1])
-      .enter()
-      .append('image')
-      .attr('xlink:href', '../../assets/star-e.svg')
-      .attr('id', 'cursor-a')
-      .style('width', '12px')
-      .style('height', '30px')
-      .attr('x', this.x(SpectrumData[this.cursor_A_postion].x_value) - 5)
-      .attr('y', this.y(SpectrumData[this.cursor_A_postion].y_value) - 5)
-      .on('click', (event: any) => this.mouseClick(event));
+    // this.basic_cursor_A = this.svg
+    // .append('g')
+    // .selectAll('.cursor')
+    // .data([1])
+    // .enter()
+    // .append('image')
+    // .attr('xlink:href', '../../assets/star-e.svg')
+    // .attr('id', 'cursor-a')
+    // .style('width', '12px')
+    // .style('height', '30px')
+    // .attr('x', this.x(SpectrumData[this.cursor_A_postion].x_value) - 5)
+    // .attr('y', this.y(SpectrumData[this.cursor_A_postion].y_value) - 5)
+    // .on('click', (event: any) => this.mouseClick(event));
 
     this.basic_cursor_B = this.svg
       .append('g')
@@ -140,7 +140,6 @@ export class WaveformComponent implements OnInit {
 
   renderSideBands(x_coordinate: number, deltaForSideband: number) {
     let sideBandIdIndex = 0;
-    // throw new Error('Method not implemented.');
     let nextXValSideBand = x_coordinate; //x_coordinate + this.deltaForSideband;
     let indexOfNextSideBand = 0; //d3.bisectCenter(this.X, nextXValSideBand);
 
@@ -159,13 +158,6 @@ export class WaveformComponent implements OnInit {
         .style('height', '10px')
         .attr('x', this.x(SpectrumData[indexOfNextSideBand].x_value) - 5)
         .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5);
-      console.log(
-        'r-side-band-' + (sideBandIdIndex - 1),
-        ' \n next x-vlaue',
-        nextXValSideBand,
-        '\n WaveformIndex-Next sideband: ',
-        SpectrumData[indexOfNextSideBand].x_value
-      );
     }
 
     let prevXValSideBand = x_coordinate;
@@ -201,13 +193,12 @@ export class WaveformComponent implements OnInit {
         startX = d.x;
       })
       .on('end', (d: any) => {
-        let updatedCoordinates =
-          SpectrumData[d3.bisectCenter(this.X, this.x.invert(d.x))];
-        let currentCoordinates =
-          SpectrumData[d3.bisectCenter(this.X, this.x.invert(startX))];
-
-        let diffInXvalues = //startX - d.x;
-          +updatedCoordinates.x_value - +currentCoordinates.x_value;
+        // let updatedCoordinates =
+        //   SpectrumData[d3.bisectCenter(this.X, this.x.invert(d.x))];
+        // let currentCoordinates =
+        //   SpectrumData[d3.bisectCenter(this.X, this.x.invert(startX))];
+        // let diffInXvalues = //startX - d.x;
+        //   +updatedCoordinates.x_value - +currentCoordinates.x_value;
         // console.log('UC', updatedCoordinates, 'CC', currentCoordinates);
         // console.log('startX - d.x:  ', startX - d.x);
         // console.log('diffInXvalues: ', diffInXvalues);
