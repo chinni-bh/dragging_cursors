@@ -1,7 +1,24 @@
 <!-- <div>
 <app-line-chart></app-line-chart>
 </div> -->
+<!-- <button class="primary"></button> -->
+<div class="row">
+  <!-- <mat-slide-toggle [checked]="isSyncEnable"></mat-slide-toggle> -->
+  <input
+    type="checkbox"
+    [checked]="isSyncEnable"
+    (change)="isSyncEnable = !isSyncEnable"
+  />
+  Enable sync
+</div>
+<hr />
 <div style="display: flex; justify-content: space-around">
-  <app-waveform style="border: solid"></app-waveform>
-  <app-waveform2 style="border: solid"></app-waveform2>
+  <app-waveform
+    style="border: solid"
+    [isSyncEnable]="isSyncEnable"
+  ></app-waveform>
+  <app-waveform2
+    style="border: solid"
+    [isSyncEnable]="isSyncEnable"
+  ></app-waveform2>
 </div>

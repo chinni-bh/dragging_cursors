@@ -5,18 +5,18 @@ import { AppComponent } from './app.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { WaveformComponent } from './waveform/waveform.component';
 import { Waveform2Component } from './waveform2/waveform2.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+// import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   declarations: [
     AppComponent,
     LineChartComponent,
     WaveformComponent,
-    Waveform2Component
+    Waveform2Component,
   ],
-  imports: [
-    BrowserModule
-  ],
+  imports: [BrowserModule, MatSlideToggleModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import * as d3Selection from 'd3-selection';
 import * as d3Scale from 'd3-scale';
 import * as d3Shape from 'd3-shape';
@@ -16,7 +22,9 @@ import { SideBandServiceService } from '../side-band-service.service';
   templateUrl: './waveform2.component.html',
   styleUrls: ['./waveform2.component.scss'],
 })
-export class Waveform2Component implements OnInit {
+export class Waveform2Component implements OnInit, OnChanges {
+  @Input() isSyncEnable: boolean = false;
+
   private margin = { top: 20, right: 20, bottom: 30, left: 30 };
   private width: number;
   private height: number;
@@ -45,20 +53,25 @@ export class Waveform2Component implements OnInit {
     this.height = 500 - this.margin.top - this.margin.bottom;
     this.cursor_readout = d3.select('readout');
   }
+  ngOnChanges(changes: SimpleChanges): void {
+    this.svg?.selectAll("image[id*='side-band-']").remove();
+    if (this.isSyncEnable) {
+      this.sidebandService.markerClickSubject.subscribe(() => {
+        let x_coordinate = +SpectrumData[this.cursor_B_postion].x_value;
+        this.renderSideBands(x_coordinate, this.deltaForSideband);
+      });
 
+      this.sidebandService.sidebandDragSubject.subscribe((value) => {
+        let x_coordinate = +SpectrumData[this.cursor_B_postion].x_value;
+        this.svg.selectAll("image[id*='side-band-']").remove();
+        this.deltaForSideband = value;
+        this.renderSideBands(x_coordinate, value);
+      });
+    }
+  }
   ngOnInit() {
     this.X = WaveformData.map((data) => data.x_value);
     this.Y = WaveformData.map((data) => data.y_value);
-    this.sidebandService.markerClickSubject.subscribe(() => {
-      let x_coordinate = +WaveformData[this.cursor_B_postion].x_value;
-      this.renderSideBands(x_coordinate, this.deltaForSideband);
-    });
-    this.sidebandService.sidebandDragSubject.subscribe((value) => {
-      let x_coordinate = +WaveformData[this.cursor_B_postion].x_value;
-      this.svg.selectAll("image[id*='side-band-']").remove();
-      this.deltaForSideband = value;
-      this.renderSideBands(x_coordinate, value);
-    });
 
     this.initSvg();
     this.initAxis();
@@ -232,7 +245,9 @@ export class Waveform2Component implements OnInit {
 
         this.svg.selectAll("image[id*='side-band-']").remove();
         this.renderSideBands(x_coordinate, this.deltaForSideband);
-        this.sidebandService.sidebandDragSubject.next(this.deltaForSideband);
+        if (this.isSyncEnable) {
+          this.sidebandService.sidebandDragSubject.next(this.deltaForSideband);
+        }
       });
     this.svg.selectAll("image[id*='side-band-']").call(drag);
   }
@@ -248,6 +263,8 @@ export class Waveform2Component implements OnInit {
       ].x_value;
     console.log('Base Band', x_coordinate);
     this.renderSideBands(x_coordinate, this.deltaForSideband);
-    this.sidebandService.markerClickSubject.next();
+    if (this.isSyncEnable) {
+      this.sidebandService.markerClickSubject.next();
+    }
   };
 }
