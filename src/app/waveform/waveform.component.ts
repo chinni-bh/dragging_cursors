@@ -54,7 +54,7 @@ export class WaveformComponent implements OnInit, OnChanges {
     this.cursor_readout = d3.select('readout');
   }
   ngOnChanges(changes: SimpleChanges): void {
-    this.svg.selectAll("image[id*='side-band-']").remove();
+    this.svg?.selectAll("image[id*='side-band-']").remove();
     if (this.isSyncEnable) {
       this.sidebandService.markerClickSubject.subscribe(() => {
         let x_coordinate = +SpectrumData[this.cursor_B_postion].x_value;
@@ -182,7 +182,8 @@ export class WaveformComponent implements OnInit, OnChanges {
         .style('width', '10px')
         .style('height', '10px')
         .attr('x', this.x(SpectrumData[indexOfNextSideBand].x_value) - 5)
-        .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5);
+        .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5)
+        .on('click', (event: any) => this.sidebandClick(event));
     }
 
     let prevXValSideBand = x_coordinate;
@@ -201,7 +202,9 @@ export class WaveformComponent implements OnInit, OnChanges {
         .style('width', '10px')
         .style('height', '10px')
         .attr('x', this.x(SpectrumData[indexOfNextSideBand].x_value) - 5)
-        .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5);
+        .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5)
+        .on('click', (event: any) => this.sidebandClick(event));
+
       console.log(
         'l-side-band-' + (sideBandIdIndex - 1),
         ' \n prev x-vlaue',
@@ -265,5 +268,28 @@ export class WaveformComponent implements OnInit, OnChanges {
     if (this.isSyncEnable) {
       this.sidebandService.markerClickSubject.next();
     }
+  };
+
+  public sidebandClick = (event: any) => {
+    // this.svg.select(`image[id='${event.target.id}']`).remove();
+    this.sidebandService.sidebandClick.next(event);
+    // let x_coordinate =
+    //   +SpectrumData[d3.bisectCenter(this.X, this.x.invert(event.x) - 4.5)]
+    //     .x_value;
+    // let y_coordinate =
+    //   +SpectrumData[d3.bisectCenter(this.X, this.x.invert(event.x) - 5)]
+    //     .y_value;
+    // this.svg
+    //   .append('g')
+    //   .selectAll('.cursor')
+    //   .data([1])
+    //   .enter()
+    //   .append('image')
+    //   .attr('xlink:href', '../../assets/birds.svg')
+    //   .attr('id', event.target.id)
+    //   .style('width', '12px')
+    //   .style('height', '13px')
+    //   .attr('x', this.x(x_coordinate) - 5)
+    //   .attr('y', this.y(y_coordinate) - 5);
   };
 }

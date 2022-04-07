@@ -9,5 +9,5 @@ export class AppComponent {
   title = 'line-chart';
   // color: ThemePalette = 'accent';
   // checked = false;
-  isSyncEnable = false;
+  isSyncEnable = true;
 }

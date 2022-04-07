@@ -7,5 +7,6 @@ import { BehaviorSubject, Subject } from 'rxjs';
 export class SideBandServiceService {
   markerClickSubject = new Subject();
   sidebandDragSubject = new Subject<number>();
+  sidebandClick = new Subject<any>();
   constructor() {}
 }

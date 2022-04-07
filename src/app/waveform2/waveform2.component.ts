@@ -67,11 +67,31 @@ export class Waveform2Component implements OnInit, OnChanges {
         this.deltaForSideband = value;
         this.renderSideBands(x_coordinate, value);
       });
+      this.sidebandService.sidebandClick.subscribe((value) => {
+        let x_coordinate =
+          +SpectrumData[d3.bisectCenter(this.X, this.x.invert(value.x) - 4.5)]
+            .x_value;
+        let y_coordinate =
+          +SpectrumData[d3.bisectCenter(this.X, this.x.invert(value.x) - 5)]
+            .y_value;
+        this.svg
+          .append('g')
+          .selectAll('.cursor')
+          .data([1])
+          .enter()
+          .append('image')
+          .attr('xlink:href', '../../assets/birds.svg')
+          .attr('id', value.target.id)
+          .style('width', '12px')
+          .style('height', '13px')
+          .attr('x', this.x(x_coordinate) - 5)
+          .attr('y', this.y(y_coordinate) - 5);
+      });
     }
   }
   ngOnInit() {
-    this.X = WaveformData.map((data) => data.x_value);
-    this.Y = WaveformData.map((data) => data.y_value);
+    this.X = SpectrumData.map((data) => data.x_value);
+    this.Y = SpectrumData.map((data) => data.y_value);
 
     this.initSvg();
     this.initAxis();
@@ -96,8 +116,8 @@ export class Waveform2Component implements OnInit, OnChanges {
   private initAxis() {
     this.x = d3Scale.scaleLinear().range([0, this.width]);
     this.y = d3Scale.scaleLinear().range([this.height, 0]);
-    this.x.domain(d3Array.extent(WaveformData, (d) => d.x_value));
-    this.y.domain(d3Array.extent(WaveformData, (d) => d.y_value));
+    this.x.domain(d3Array.extent(SpectrumData, (d) => d.x_value));
+    this.y.domain(d3Array.extent(SpectrumData, (d) => d.y_value));
   }
 
   private drawAxis() {
@@ -121,7 +141,7 @@ export class Waveform2Component implements OnInit, OnChanges {
 
     this.svg
       .append('path')
-      .datum(WaveformData)
+      .datum(SpectrumData)
       .attr('class', 'line')
       .attr('d', this.line)
       .style('fill', 'lightgrey')
@@ -140,8 +160,8 @@ export class Waveform2Component implements OnInit, OnChanges {
     // .attr('id', 'cursor-a')
     // .style('width', '12px')
     // .style('height', '30px')
-    // .attr('x', this.x(WaveformData[this.cursor_A_postion].x_value) - 5)
-    // .attr('y', this.y(WaveformData[this.cursor_A_postion].y_value) - 5)
+    // .attr('x', this.x(SpectrumData[this.cursor_A_postion].x_value) - 5)
+    // .attr('y', this.y(SpectrumData[this.cursor_A_postion].y_value) - 5)
     // .on('click', (event: any) => this.mouseClick(event));
 
     this.basic_cursor_B = this.svg
@@ -154,8 +174,8 @@ export class Waveform2Component implements OnInit, OnChanges {
       .attr('id', 'cursor-b')
       .style('width', '13px')
       .style('height', '20px')
-      .attr('x', this.x(WaveformData[this.cursor_B_postion].x_value) - 6)
-      .attr('y', this.y(WaveformData[this.cursor_B_postion].y_value) - 15)
+      .attr('x', this.x(SpectrumData[this.cursor_B_postion].x_value) - 6)
+      .attr('y', this.y(SpectrumData[this.cursor_B_postion].y_value) - 15)
       .on('click', (event: any) => this.mouseClick(event));
 
     // This allows to find the closest X index of the mouse:
@@ -182,8 +202,8 @@ export class Waveform2Component implements OnInit, OnChanges {
         .attr('id', 'r-side-band-' + sideBandIdIndex++)
         .style('width', '10px')
         .style('height', '10px')
-        .attr('x', this.x(WaveformData[indexOfNextSideBand].x_value) - 5)
-        .attr('y', this.y(WaveformData[indexOfNextSideBand].y_value) - 5);
+        .attr('x', this.x(SpectrumData[indexOfNextSideBand].x_value) - 5)
+        .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5);
     }
 
     let prevXValSideBand = x_coordinate;
@@ -201,8 +221,8 @@ export class Waveform2Component implements OnInit, OnChanges {
         .attr('id', 'l-side-band-' + sideBandIdIndex++)
         .style('width', '10px')
         .style('height', '10px')
-        .attr('x', this.x(WaveformData[indexOfNextSideBand].x_value) - 5)
-        .attr('y', this.y(WaveformData[indexOfNextSideBand].y_value) - 5);
+        .attr('x', this.x(SpectrumData[indexOfNextSideBand].x_value) - 5)
+        .attr('y', this.y(SpectrumData[indexOfNextSideBand].y_value) - 5);
       console.log(
         'l-side-band-' + (sideBandIdIndex - 1),
         ' \n prev x-vlaue',
@@ -220,9 +240,9 @@ export class Waveform2Component implements OnInit, OnChanges {
       })
       .on('end', (d: any) => {
         // let updatedCoordinates =
-        //   WaveformData[d3.bisectCenter(this.X, this.x.invert(d.x))];
+        //   SpectrumData[d3.bisectCenter(this.X, this.x.invert(d.x))];
         // let currentCoordinates =
-        //   WaveformData[d3.bisectCenter(this.X, this.x.invert(startX))];
+        //   SpectrumData[d3.bisectCenter(this.X, this.x.invert(startX))];
         // let diffInXvalues = //startX - d.x;
         //   +updatedCoordinates.x_value - +currentCoordinates.x_value;
         // console.log('UC', updatedCoordinates, 'CC', currentCoordinates);
@@ -232,9 +252,9 @@ export class Waveform2Component implements OnInit, OnChanges {
       })
       .on('drag', (d: any) => {
         let updatedCoordinates =
-          WaveformData[d3.bisectCenter(this.X, this.x.invert(d.x))];
+          SpectrumData[d3.bisectCenter(this.X, this.x.invert(d.x))];
         let currentCoordinates =
-          WaveformData[d3.bisectCenter(this.X, this.x.invert(startX))];
+          SpectrumData[d3.bisectCenter(this.X, this.x.invert(startX))];
 
         let diffInXvalues = //startX - d.x;
           +updatedCoordinates.x_value - +currentCoordinates.x_value;
@@ -258,7 +278,7 @@ export class Waveform2Component implements OnInit, OnChanges {
       id_extension = 'a';
     }
     let x_coordinate =
-      +WaveformData[
+      +SpectrumData[
         id_extension === 'a' ? this.cursor_A_postion : this.cursor_B_postion
       ].x_value;
     console.log('Base Band', x_coordinate);
