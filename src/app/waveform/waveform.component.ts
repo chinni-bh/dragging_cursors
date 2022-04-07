@@ -25,7 +25,7 @@ import { SideBandServiceService } from '../side-band-service.service';
 export class WaveformComponent implements OnInit, OnChanges {
   @Input() isSyncEnable: boolean = false;
 
-  private margin = { top: 20, right: 20, bottom: 30, left: 30 };
+  private margin = { top: 20, right: 20, bottom: 30, left: 50 };
   private width: number;
   private height: number;
   private x: any;
@@ -55,6 +55,8 @@ export class WaveformComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges): void {
     this.svg?.selectAll("image[id*='side-band-']").remove();
+    this.svg?.selectAll("image[id*='cursor-sync']").remove();
+
     if (this.isSyncEnable) {
       this.sidebandService.markerClickSubject.subscribe(() => {
         let x_coordinate = +SpectrumData[this.cursor_B_postion].x_value;
@@ -84,12 +86,41 @@ export class WaveformComponent implements OnInit, OnChanges {
   private initSvg() {
     this.svg = d3Selection
       .select('svg')
+      .on('click', (event: any) => {
+        this.chartClick(event);
+      })
       .append('g')
       .attr(
         'transform',
         'translate(' + this.margin.left + ',' + this.margin.top + ')'
       );
-    // .on('click', (event: any) => this.mouseClick(event))
+    // this.svg = d3Selection
+    //   .select('.spectrum')
+    //   .on('click', (event: any) => this.chartClick(event));
+  }
+  // ;
+
+  chartClick(event: any): void {
+    console.log(event.x, event.y);
+    const i = d3.bisectCenter(this.X, this.x.invert(d3.pointer(event)[0] - 49));
+    // this.basic_cursorA
+    //   .attr('x', this.x(WaveformData[i].x_value) - 10)
+    //   .attr('y', this.y(WaveformData[i].y_value) - 15);
+    this.svg
+      .append('g')
+      .selectAll('.cursor')
+      .data([1])
+      .enter()
+      .append('image')
+      .attr('xlink:href', '../../assets/timer.svg')
+      .attr('id', 'cursor-sync')
+      .style('width', '13px')
+      .style('height', '30px')
+      .attr('x', this.x(SpectrumData[i].x_value) - 10)
+      .attr('y', this.y(SpectrumData[i].y_value) - 15);
+    // .on('click', (event: any) => this.mouseClick(event));
+    if (this.isSyncEnable)
+      this.sidebandService.chartClick.next(d3.pointer(event)[0]);
   }
 
   private initAxis() {
@@ -125,7 +156,8 @@ export class WaveformComponent implements OnInit, OnChanges {
       .attr('d', this.line)
       .style('fill', 'red')
       .style('stroke', 'blue')
-      .style('stroke-width', '1');
+      .style('stroke-width', '1')
+      .on('click', (event: any) => this.chartClick(event));
   }
 
   private renderCursor() {

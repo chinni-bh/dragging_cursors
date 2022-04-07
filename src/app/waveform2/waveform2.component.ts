@@ -87,6 +87,23 @@ export class Waveform2Component implements OnInit, OnChanges {
           .attr('x', this.x(x_coordinate) - 5)
           .attr('y', this.y(y_coordinate) - 5);
       });
+      this.sidebandService.chartClick.subscribe((value) => {
+        const i = d3.bisectCenter(this.X, this.x.invert(value - 49));
+        console.log('subbscribled chart click');
+
+        this.svg
+          .append('g')
+          .selectAll('.cursor')
+          .data([1])
+          .enter()
+          .append('image')
+          .attr('xlink:href', '../../assets/timer.svg')
+          .attr('id', 'cursor-sync1')
+          .style('width', '13px')
+          .style('height', '30px')
+          .attr('x', this.x(SpectrumData[i].x_value) - 10)
+          .attr('y', this.y(SpectrumData[i].y_value) - 15);
+      });
     }
   }
   ngOnInit() {

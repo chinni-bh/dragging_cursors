@@ -8,5 +8,6 @@ export class SideBandServiceService {
   markerClickSubject = new Subject();
   sidebandDragSubject = new Subject<number>();
   sidebandClick = new Subject<any>();
+  chartClick = new Subject<number>();
   constructor() {}
 }
