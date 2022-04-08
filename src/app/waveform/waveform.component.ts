@@ -9,6 +9,7 @@ import { SpectrumData } from '../shared/spectrum-data';
 import * as d3 from 'd3';
 import { BehaviorSubject } from 'rxjs';
 import { ThisReceiver } from '@angular/compiler';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-waveform',
@@ -60,115 +61,114 @@ export class WaveformComponent implements OnInit {
     this.drawAxis();
     this.drawLine();
     this.renderCursor();
-    this.addLegendDiv();
-    this.renderLegends();
-
-    // render([
-    //   {
-    //     name: 'series XFASDFA',
-    //     color: 'red',
-    //     symbol: circleSymbol,
-    //     opacity: 0.5,
-    //   },
-    //   {
-    //     name: 'series 2',
-    //     color: 'blue',
-    //     symbol: circleSymbol,
-    //     opacity: 0.3,
-    //   },
-    // ]);
-  }
-  renderLegends() {
-    var responsiveDivHeight = 20 * 30;
-    var div = d3
-      .select('#legendDiv')
-      .append('div')
-      .classed('legend-entry', true)
-      .attr('height', '100%')
-      .attr('width', '100%')
-      .attr('viewbox', '0 0 500 ' + responsiveDivHeight + '')
-      .attr('preserveAspectRatio', 'xMinYMin');
-
-    div
-      .append('svg')
-      .classed('legend-entry-svg', true)
-      .attr('viewBox', '0 0 100 100')
-      .append('path')
-      .attr('transform', 'translate(50 50)');
-
-    div.append('span').classed('legend-entry-name', true);
-    div
-      .select('.legend-entry-svg path')
-      .attr('d', this.circleSymbol(20))
-      .attr('fill', 'red')
-      .attr('opacity', '1');
-
-    div.select('.legend-entry-name').text('Frequence');
-    // entries = [
-    //   {
-    //     name: 'series 1',
-    //     color: 'red',
-    //     symbol: this.circleSymbol,
-    //     opacity: 0.5,
-    //   },
-    // ];
-    // var entriesUpdate: any = d3
-    //   .select('#container')
-    //   .selectAll('.legend-entry')
-    //   .data(entries);
-    // entriesUpdate.exit().remove();
-
-    // var entriesEnter = entriesUpdate
-    //   .enter()
-    //   .append('div')
-    //   .classed('legend-entry', true);
-
-    // // create DOM for marker
-    // entriesEnter
-    //   .append('svg')
-    //   .classed('legend-entry-svg', true)
-    //   .attr('viewBox', '0 0 100 100')
-    //   .append('path')
-    //   .attr('transform', 'translate(50 50)');
-
-    // // create DOM for name
-    // entriesEnter.append('span').classed('legend-entry-name', true);
-
-    // var entries: any = entriesEnter.merge(entriesUpdate);
-    // entries.foreach((entry: any) => {
-    //   var entryDiv = d3.select('#container');
-
-    //   entryDiv
-    //     .select('.legend-entry-svg path')
-    //     .attr('d', entry.symbol(100))
-    //     .attr('fill', entry.color)
-    //     .attr('opacity', entry.opacity);
-
-    //   entryDiv.select('.legend-entry-name').text(entry.name);
-    // });
+    this.downloadPNG();
   }
 
-  addLegendDiv(): void {
-    if (this.showCard) {
-      const localIndex = this.index;
-      const w = this.width - 4;
-      const h = this.height;
-      const lineHeight = 60;
+  downloadPNG() {
+    d3.select('#saveButton').on('click', () => {
+      var svgString = this.getSVGString(d3.select('svg#wf').node());
+      this.svgString2Image(
+        svgString,
+        2 * this.width,
+        2 * this.height,
+        'png',
+        (dataBlob) => {
+          saveAs(dataBlob, 'D3 vis exported to PNG.png'); // FileSaver.js function
+        }
+      );
+    });
+  }
 
-      try {
-        const cont = d3.select('#cont_line_' + localIndex);
-        const div = cont.select('.plotly .svg-container');
-        const yBase = h - lineHeight - 20;
-        div
-          .append('div')
-          .attr('class', 'legend-area la-' + localIndex)
-          .style('top', `${yBase}px`)
-          .append('svg')
-          .style('width', `${w}px`)
-          .style('height', `${lineHeight - 5}px`)
-          .attr('class', 'legend-svg legend-' + localIndex);
-      } catch (e) {}
+  svgString2Image(
+    svgString: string,
+    width: number,
+    height: number,
+    format: string,
+    callback: (dataBlob: any) => void
+  ) {
+    var format = format ? format : 'png';
+    var imgsrc =
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(svgString))); // Convert SVG string to data URL
+
+    var image = new Image();
+    image.onload = () => {
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      context?.clearRect(0, 0, width, height);
+      context?.drawImage(image, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        // var filesize = 300 + 'KB'; // Math.round(blob?.length / 1024) + ' KB';
+        if (callback) callback(blob);
+      });
+    };
+    image.src = imgsrc;
+  }
+
+  getSVGString(svgNode: any) {
+    // throw new Error('Method not implemented.');
+    svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+    var cssStyleText = this.getCSSStyles(svgNode);
+    this.appendCSS(cssStyleText, svgNode);
+    var serializer = new XMLSerializer();
+    var svgString = serializer.serializeToString(svgNode);
+    svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
+    svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
+    return svgString;
+  }
+  appendCSS(cssText: string, element: any) {
+    // throw new Error('Method not implemented.');
+    var styleElement = document.createElement('style');
+    styleElement.setAttribute('type', 'text/css');
+    styleElement.innerHTML = cssText;
+    var refNode = element.hasChildNodes() ? element.children[0] : null;
+    element.insertBefore(styleElement, refNode);
+  }
+  getCSSStyles(parentElement: any) {
+    // throw new Error('Method not implemented.');
+    var selectorTextArr = [];
+    // Add Parent element Id and Classes to the list
+    selectorTextArr.push('#' + parentElement.id);
+    for (var c = 0; c < parentElement.classList.length; c++)
+      if (!this.contains('.' + parentElement.classList[c], selectorTextArr))
+        selectorTextArr.push('.' + parentElement.classList[c]);
+    // Add Children element Ids and Classes to the list
+    var nodes = parentElement.getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+      var id = nodes[i].id;
+      if (!this.contains('#' + id, selectorTextArr))
+        selectorTextArr.push('#' + id);
+      var classes = nodes[i].classList;
+      for (var c = 0; c < classes.length; c++)
+        if (!this.contains('.' + classes[c], selectorTextArr))
+          selectorTextArr.push('.' + classes[c]);
     }
+    // Extract CSS Rules
+    var extractedCSSText = '';
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var s = document.styleSheets[i];
+      try {
+        if (!s.cssRules) continue;
+      } catch (e: any) {
+        if (e.name !== 'SecurityError') throw e; // for Firefox
+        continue;
+      }
+      var cssRules = s.cssRules;
+      for (var r = 0; r < cssRules.length; r++) {
+        const rule = cssRules[r];
+        if (!(rule instanceof CSSStyleRule)) {
+          continue;
+        }
+        if (this.contains(rule.selectorText, selectorTextArr))
+          extractedCSSText += cssRules[r].cssText;
+      }
+    }
+    return extractedCSSText;
+  }
+  contains(str: any, arr: any) {
+    return arr.indexOf(str) === -1 ? false : true;
   }
 
   private initSvg() {

@@ -1,20 +1,3 @@
 <p>Distance value is : {{ deltaForSideband }}X</p>
-<!-- <svg class="waveform" width="900" height="500"></svg> -->
-<!-- <div *ngIf="showCard" class="chart-container" [id]="'cont_line_' + index">
-  <plotly-plot
-    #linechart
-    [id]="'line_' + index"
-    [className]="'chart'"
-    [data]="kpiData | line: colors:title"
-    [layout]="layout"
-    [config]="config"
-    [useResizeHandler]="true"
-    [style]="{ position: 'relative', width: '100%', height: '100%' }"
-  ></plotly-plot>
-(relayout)="autoSize($event)"
-    (afterPlot)="plotDone($event)" 
-</div> -->
-
-<!-- <div id="container"></div> -->
-
-<div id="legendDiv" class="legend-main-div"></div>
+<button id="saveButton">Download PNG</button>
+<svg class="waveform" id="wf" width="900" height="500"></svg>
