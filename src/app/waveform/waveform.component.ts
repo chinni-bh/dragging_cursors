@@ -94,18 +94,11 @@ export class WaveformComponent implements OnInit, OnChanges {
         'transform',
         'translate(' + this.margin.left + ',' + this.margin.top + ')'
       );
-    // this.svg = d3Selection
-    //   .select('.spectrum')
-    //   .on('click', (event: any) => this.chartClick(event));
   }
-  // ;
 
   chartClick(event: any): void {
     console.log(event.x, event.y);
     const i = d3.bisectCenter(this.X, this.x.invert(d3.pointer(event)[0] - 49));
-    // this.basic_cursorA
-    //   .attr('x', this.x(WaveformData[i].x_value) - 10)
-    //   .attr('y', this.y(WaveformData[i].y_value) - 15);
     this.svg
       .append('g')
       .selectAll('.cursor')
@@ -118,7 +111,6 @@ export class WaveformComponent implements OnInit, OnChanges {
       .style('height', '30px')
       .attr('x', this.x(SpectrumData[i].x_value) - 10)
       .attr('y', this.y(SpectrumData[i].y_value) - 15);
-    // .on('click', (event: any) => this.mouseClick(event));
     if (this.isSyncEnable)
       this.sidebandService.chartClick.next(d3.pointer(event)[0]);
   }

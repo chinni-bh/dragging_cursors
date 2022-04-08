@@ -25,7 +25,7 @@ import { SideBandServiceService } from '../side-band-service.service';
 export class Waveform2Component implements OnInit, OnChanges {
   @Input() isSyncEnable: boolean = false;
 
-  private margin = { top: 20, right: 20, bottom: 30, left: 30 };
+  private margin = { top: 20, right: 20, bottom: 30, left: 50 };
   private width: number;
   private height: number;
   private x: any;
@@ -116,6 +116,28 @@ export class Waveform2Component implements OnInit, OnChanges {
     this.drawAxis();
     this.drawLine();
     this.renderCursor();
+    this.createLabels();
+  }
+  createLabels() {
+    this.svg
+      .append('text')
+      .attr('class', 'x label')
+      .attr('fill', 'blue')
+      .attr('text-anchor', 'end')
+      .attr('font-weight', 'bold')
+      .attr('x', this.width)
+      .attr('y', this.height + 30)
+      .text('income per capita, inflation-adjusted (dollars)');
+    this.svg
+      .append('text')
+      .attr('class', 'y label')
+      .attr('text-anchor', 'end')
+      .attr('font-weight', 'bold')
+      .attr('fill', 'blue')
+      .attr('y', -45)
+      .attr('dy', '.75em')
+      .attr('transform', 'rotate(-90)')
+      .text('life expectancy (years)');
   }
 
   private initSvg() {
@@ -193,6 +215,7 @@ export class Waveform2Component implements OnInit, OnChanges {
       .style('height', '20px')
       .attr('x', this.x(SpectrumData[this.cursor_B_postion].x_value) - 6)
       .attr('y', this.y(SpectrumData[this.cursor_B_postion].y_value) - 15)
+      // .text('income per capita, inflation-adjusted (dollars)')
       .on('click', (event: any) => this.mouseClick(event));
 
     // This allows to find the closest X index of the mouse:
