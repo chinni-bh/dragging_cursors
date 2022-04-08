@@ -60,7 +60,7 @@ export class WaveformComponent implements OnInit {
 
     this.drawAxis();
     this.drawLine();
-    this.renderCursor();
+    // this.renderCursor();
     this.downloadPNG();
   }
 
