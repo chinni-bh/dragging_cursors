@@ -35,9 +35,15 @@ export class WaveformComponent implements OnInit {
   index: any;
   isHarmonic: boolean = false;
   private line: d3Shape.Line<[number, number]> | undefined;
+  circleSymbol = (size: number) =>
+    d3
+      .symbol()
+      .type(d3.symbolCircle)
+      .size(Math.PI * Math.pow(size / 2, 2))(null);
 
   deltaForSideband = 5;
   bisect: any;
+  showCard = true;
 
   constructor() {
     this.width = 900 - this.margin.left - this.margin.right;
@@ -54,6 +60,115 @@ export class WaveformComponent implements OnInit {
     this.drawAxis();
     this.drawLine();
     this.renderCursor();
+    this.addLegendDiv();
+    this.renderLegends();
+
+    // render([
+    //   {
+    //     name: 'series XFASDFA',
+    //     color: 'red',
+    //     symbol: circleSymbol,
+    //     opacity: 0.5,
+    //   },
+    //   {
+    //     name: 'series 2',
+    //     color: 'blue',
+    //     symbol: circleSymbol,
+    //     opacity: 0.3,
+    //   },
+    // ]);
+  }
+  renderLegends() {
+    var responsiveDivHeight = 20 * 30;
+    var div = d3
+      .select('#legendDiv')
+      .append('div')
+      .classed('legend-entry', true);
+    // .attr('height', '100%')
+    // .attr('width', '100%')
+    // .attr('viewbox', '0 0 500 ' + responsiveDivHeight + '')
+    // .attr('preserveAspectRatio', 'xMinYMin');
+
+    div
+      .append('svg')
+      .classed('legend-entry-svg', true)
+      .attr('viewBox', '0 0 100 100')
+      .append('path')
+      .attr('transform', 'translate(50 50)');
+
+    div.append('span').classed('legend-entry-name', true);
+    div
+      .select('.legend-entry-svg path')
+      .attr('d', this.circleSymbol(10))
+      .attr('fill', 'red')
+      .attr('opacity', '0.5');
+
+    div.select('.legend-entry-name').text('Frequence');
+    // entries = [
+    //   {
+    //     name: 'series 1',
+    //     color: 'red',
+    //     symbol: this.circleSymbol,
+    //     opacity: 0.5,
+    //   },
+    // ];
+    // var entriesUpdate: any = d3
+    //   .select('#container')
+    //   .selectAll('.legend-entry')
+    //   .data(entries);
+    // entriesUpdate.exit().remove();
+
+    // var entriesEnter = entriesUpdate
+    //   .enter()
+    //   .append('div')
+    //   .classed('legend-entry', true);
+
+    // // create DOM for marker
+    // entriesEnter
+    //   .append('svg')
+    //   .classed('legend-entry-svg', true)
+    //   .attr('viewBox', '0 0 100 100')
+    //   .append('path')
+    //   .attr('transform', 'translate(50 50)');
+
+    // // create DOM for name
+    // entriesEnter.append('span').classed('legend-entry-name', true);
+
+    // var entries: any = entriesEnter.merge(entriesUpdate);
+    // entries.foreach((entry: any) => {
+    //   var entryDiv = d3.select('#container');
+
+    //   entryDiv
+    //     .select('.legend-entry-svg path')
+    //     .attr('d', entry.symbol(100))
+    //     .attr('fill', entry.color)
+    //     .attr('opacity', entry.opacity);
+
+    //   entryDiv.select('.legend-entry-name').text(entry.name);
+    // });
+  }
+
+  addLegendDiv(): void {
+    if (this.showCard) {
+      const localIndex = this.index;
+      const w = this.width - 4;
+      const h = this.height;
+      const lineHeight = 60;
+
+      try {
+        const cont = d3.select('#cont_line_' + localIndex);
+        const div = cont.select('.plotly .svg-container');
+        const yBase = h - lineHeight - 20;
+        div
+          .append('div')
+          .attr('class', 'legend-area la-' + localIndex)
+          .style('top', `${yBase}px`)
+          .append('svg')
+          .style('width', `${w}px`)
+          .style('height', `${lineHeight - 5}px`)
+          .attr('class', 'legend-svg legend-' + localIndex);
+      } catch (e) {}
+    }
   }
 
   private initSvg() {

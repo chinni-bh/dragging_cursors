@@ -1,0 +1,32 @@
+.legend-main-div {
+  padding: 2%;
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid blue;
+}
+#container {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  border: 1px solid red;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.legend-entry {
+  margin-bottom: 10px;
+  margin-right: 20px;
+  word-break: break-all;
+}
+
+.legend-entry-svg {
+  display: inline;
+  width: 0.714em;
+  height: 0.714em;
+  margin-right: 5px;
+}
