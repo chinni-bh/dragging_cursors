@@ -83,11 +83,11 @@ export class WaveformComponent implements OnInit {
     var div = d3
       .select('#legendDiv')
       .append('div')
-      .classed('legend-entry', true);
-    // .attr('height', '100%')
-    // .attr('width', '100%')
-    // .attr('viewbox', '0 0 500 ' + responsiveDivHeight + '')
-    // .attr('preserveAspectRatio', 'xMinYMin');
+      .classed('legend-entry', true)
+      .attr('height', '100%')
+      .attr('width', '100%')
+      .attr('viewbox', '0 0 500 ' + responsiveDivHeight + '')
+      .attr('preserveAspectRatio', 'xMinYMin');
 
     div
       .append('svg')
@@ -99,9 +99,9 @@ export class WaveformComponent implements OnInit {
     div.append('span').classed('legend-entry-name', true);
     div
       .select('.legend-entry-svg path')
-      .attr('d', this.circleSymbol(10))
+      .attr('d', this.circleSymbol(20))
       .attr('fill', 'red')
-      .attr('opacity', '0.5');
+      .attr('opacity', '1');
 
     div.select('.legend-entry-name').text('Frequence');
     // entries = [
