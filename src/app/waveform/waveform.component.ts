@@ -9,7 +9,7 @@ import { SpectrumData } from '../shared/spectrum-data';
 import * as d3 from 'd3';
 import { BehaviorSubject } from 'rxjs';
 import { ThisReceiver } from '@angular/compiler';
-import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-waveform',
@@ -61,120 +61,16 @@ export class WaveformComponent implements OnInit {
     this.drawAxis();
     this.drawLine();
     // this.renderCursor();
-    this.downloadPNG();
-  }
-
-  downloadPNG() {
-    d3.select('#saveButton').on('click', () => {
-      var svgString = this.getSVGString(d3.select('svg#wf').node());
-      this.svgString2Image(
-        svgString,
-        2 * this.width,
-        2 * this.height,
-        'png',
-        (dataBlob) => {
-          saveAs(dataBlob, 'D3 vis exported to PNG.png'); // FileSaver.js function
-        }
-      );
-    });
-  }
-
-  svgString2Image(
-    svgString: string,
-    width: number,
-    height: number,
-    format: string,
-    callback: (dataBlob: any) => void
-  ) {
-    var format = format ? format : 'png';
-    var imgsrc =
-      'data:image/svg+xml;base64,' +
-      btoa(unescape(encodeURIComponent(svgString))); // Convert SVG string to data URL
-
-    var image = new Image();
-    image.onload = () => {
-      var canvas = document.createElement('canvas');
-      var context = canvas.getContext('2d');
-      canvas.width = width;
-      canvas.height = height;
-      context?.clearRect(0, 0, width, height);
-      context?.drawImage(image, 0, 0, width, height);
-      canvas.toBlob((blob) => {
-        // var filesize = 300 + 'KB'; // Math.round(blob?.length / 1024) + ' KB';
-        if (callback) callback(blob);
-      });
-    };
-    image.src = imgsrc;
-  }
-
-  getSVGString(svgNode: any) {
-    // throw new Error('Method not implemented.');
-    svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
-    var cssStyleText = this.getCSSStyles(svgNode);
-    this.appendCSS(cssStyleText, svgNode);
-    var serializer = new XMLSerializer();
-    var svgString = serializer.serializeToString(svgNode);
-    svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
-    svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
-    return svgString;
-  }
-  appendCSS(cssText: string, element: any) {
-    // throw new Error('Method not implemented.');
-    var styleElement = document.createElement('style');
-    styleElement.setAttribute('type', 'text/css');
-    styleElement.innerHTML = cssText;
-    var refNode = element.hasChildNodes() ? element.children[0] : null;
-    element.insertBefore(styleElement, refNode);
-  }
-  getCSSStyles(parentElement: any) {
-    // throw new Error('Method not implemented.');
-    var selectorTextArr = [];
-    // Add Parent element Id and Classes to the list
-    selectorTextArr.push('#' + parentElement.id);
-    for (var c = 0; c < parentElement.classList.length; c++)
-      if (!this.contains('.' + parentElement.classList[c], selectorTextArr))
-        selectorTextArr.push('.' + parentElement.classList[c]);
-    // Add Children element Ids and Classes to the list
-    var nodes = parentElement.getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-      var id = nodes[i].id;
-      if (!this.contains('#' + id, selectorTextArr))
-        selectorTextArr.push('#' + id);
-      var classes = nodes[i].classList;
-      for (var c = 0; c < classes.length; c++)
-        if (!this.contains('.' + classes[c], selectorTextArr))
-          selectorTextArr.push('.' + classes[c]);
-    }
-    // Extract CSS Rules
-    var extractedCSSText = '';
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      var s = document.styleSheets[i];
-      try {
-        if (!s.cssRules) continue;
-      } catch (e: any) {
-        if (e.name !== 'SecurityError') throw e; // for Firefox
-        continue;
-      }
-      var cssRules = s.cssRules;
-      for (var r = 0; r < cssRules.length; r++) {
-        const rule = cssRules[r];
-        if (!(rule instanceof CSSStyleRule)) {
-          continue;
-        }
-        if (this.contains(rule.selectorText, selectorTextArr))
-          extractedCSSText += cssRules[r].cssText;
-      }
-    }
-    return extractedCSSText;
-  }
-  contains(str: any, arr: any) {
-    return arr.indexOf(str) === -1 ? false : true;
   }
 
   private initSvg() {
     this.svg = d3Selection
       .select('svg')
-      // .on('click', (event: any) => this.mouseClick(event))
+      // Responsive SVG needs these 2 attributes and no width and height attr.
+      .attr('preserveAspectRatio', 'xMinYMin meet')
+      .attr('viewBox', '0 0 990 550')
+      // Class to make it responsive.
+      .classed('svg-content-responsive', true)
       .append('g')
       .attr(
         'transform',

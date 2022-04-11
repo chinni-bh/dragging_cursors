@@ -1,0 +1,27 @@
+https://github.com/chinni-bh/d3-poc-cursors
+https://observablehq.com/@sergeyobodovskiy/interactive-line-chart
+
+Note:
+Think in terms of SVG styling, not the HTML styles
+ 
+    //some Random 27th value of the waveform
+    console.log(WaveformData[27].x_value);
+    //to get the scale value from waveform data point
+    console.log(this.x(WaveformData[27].x_value));
+    //to get the waveform data point form scale value(approximate vlaue)
+    console.log(this.x.invert(this.x(WaveformData[27].x_value)));
+    //to get the nearest index of waveform data based on the passed value
+    //bisectCenter() - 1st arg: Array of x-values, 2nd arg: approx. value.
+    console.log(
+      d3.bisectCenter(this.X, this.x.invert(this.x(WaveformData[27].x_value)))
+    );
+
+ 
+
+
+Note:
+To the index based on the click event,
+this.x.invert(d3.pointer(event)[0]-49)
+d3.bisectCenter(X, this.x.invert(d3.pointer(event)[0]-49));
+X-represents the complete x-values in the data
+
